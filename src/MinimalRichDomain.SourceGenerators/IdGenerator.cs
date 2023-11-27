@@ -59,6 +59,29 @@ public readonly struct {idTypeName}
     public static {idTypeName} New() => new(Guid.NewGuid());
 
     public static {idTypeName} FromValue(Guid value) => new(value);
+
+    public static bool operator ==({idTypeName} left, {idTypeName} right)
+    {{
+        return left.Equals(right);
+    }}
+
+    public static bool operator !=({idTypeName} left, {idTypeName} right)
+    {{
+        return !left.Equals(right);
+    }}
+
+    public override bool Equals(object? obj)
+    {{
+        if(obj is not {idTypeName} other)
+            return false;
+        else
+            return Value == other.Value;
+    }}
+
+    public override int GetHashCode()
+    {{
+        return Value.GetHashCode();
+    }}
 }}
     ";
         }
