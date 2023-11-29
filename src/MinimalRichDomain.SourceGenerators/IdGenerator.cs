@@ -21,10 +21,15 @@ namespace MinimalRichDomain.SourceGenerators
 
             foreach (var classSyntax in classesToGenerate)
             {
+                var semanticModel = context.Compilation.GetSemanticModel(classSyntax.SyntaxTree);
+                var namespaceSymbol = semanticModel.GetDeclaredSymbol(classSyntax)?.ContainingNamespace;
+                var namespaceName = namespaceSymbol?.ToDisplayString() ?? string.Empty;
+
+
                 var className = classSyntax.Identifier.Text;
                 var idTypeName = $"{className}Id";
 
-                var idCode = GenerateIdCode(idTypeName);
+                var idCode = GenerateIdCode(namespaceName, idTypeName);
 
                 context.AddSource($"{idTypeName}.g.cs", SourceText.From(idCode, Encoding.UTF8));
             }
@@ -42,12 +47,10 @@ namespace MinimalRichDomain.SourceGenerators
                    attributeName.Equals("GenerateIdAttribute", StringComparison.InvariantCultureIgnoreCase);
         }
 
-        private static string GenerateIdCode(string idTypeName)
+        private static string GenerateIdCode(string namespaceName, string idTypeName)
         {
-            return $@"
-using System;
-
-public readonly struct {idTypeName}
+            var namespaceLine = !string.IsNullOrEmpty(namespaceName) ? $"namespace {namespaceName};\r\n" : string.Empty;
+            return $@"{namespaceLine}public readonly struct {idTypeName}
 {{
     public Guid Value {{ get; }}
 
