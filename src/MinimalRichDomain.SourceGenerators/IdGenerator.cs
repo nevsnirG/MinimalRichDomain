@@ -49,8 +49,10 @@ namespace MinimalRichDomain.SourceGenerators
 
         private static string GenerateIdCode(string namespaceName, string idTypeName)
         {
-            var namespaceLine = !string.IsNullOrEmpty(namespaceName) ? $"namespace {namespaceName};\r\n" : string.Empty;
-            return $@"{namespaceLine}public readonly struct {idTypeName}
+            var namespaceLine = !string.IsNullOrEmpty(namespaceName) ? $"namespace {namespaceName};\r\n\r\n" : string.Empty;
+            return $@"using System;
+
+{namespaceLine}public readonly struct {idTypeName}
 {{
     public Guid Value {{ get; }}
 
