@@ -56,6 +56,8 @@ namespace MinimalRichDomain.SourceGenerators
 {{
     public Guid Value {{ get; }}
 
+    public static {idTypeName} Empty => new(Guid.Empty);
+
     private {idTypeName}(Guid value)
     {{
         Value = value;
