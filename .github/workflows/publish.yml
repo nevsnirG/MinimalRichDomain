@@ -80,13 +80,24 @@ jobs:
       env:
         Configuration: ${{ matrix.configuration }}
 
-    - name: Publish NuGet
+    - name: NuGet push
+      # You may pin to the exact commit or the version.
+      uses: edumserrano/nuget-push@v1.2.2
+      with:
+        # The API key for the NuGet server. Used when pushing the NuGet packages and symbols.
+        api-key: ${{ secrets.nuget_api_key }}
+        # Indicates whether this actions should fail if the NuGet package being pushed already exists. Defaults to false.
+        fail-if-exists: true
+        # The directory that will be used to push NuGet packages. It will push all NuGet packages (*.nupkg) and corresponding symbol packages (*.snupkg) present in the directory.
+        working-directory: src\MinimalRichDomain.SourceGenerators\bin\Release
+          
+   # - name: Publish NuGet
     # You may pin to the exact commit or the version.
     # uses: brandedoutcast/publish-nuget@c12b8546b67672ee38ac87bea491ac94a587f7cc
-      uses: brandedoutcast/publish-nuget@v2.5.5
-      with:
+    #  uses: brandedoutcast/publish-nuget@v2.5.5
+    #  with:
         # Filepath of the project to be packaged, relative to root of repository
-        PROJECT_FILE_PATH: src\MinimalRichDomain.SourceGenerators\MinimalRichDomain.SourceGenerators.csproj
+     #   PROJECT_FILE_PATH: src\MinimalRichDomain.SourceGenerators\MinimalRichDomain.SourceGenerators.csproj
         # NuGet package id, used for version detection & defaults to project name
         #PACKAGE_NAME: # optional
         # Filepath with version info, relative to root of repository & defaults to PROJECT_FILE_PATH
@@ -100,8 +111,8 @@ jobs:
         # Format of the git tag, [*] gets replaced with actual version
         #TAG_FORMAT: # optional, default is v*
         # API key to authenticate with NuGet server
-        NUGET_KEY: ${{ secrets.nuget_api_key }}
+     #   NUGET_KEY: ${{ secrets.nuget_api_key }}
         # NuGet server uri hosting the packages, defaults to https://api.nuget.org
         #NUGET_SOURCE: # optional, default is https://api.nuget.org
         # Flag to toggle pushing symbols along with nuget package to the server, disabled by default
-        INCLUDE_SYMBOLS: true
+      #  INCLUDE_SYMBOLS: true
