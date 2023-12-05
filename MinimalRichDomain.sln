@@ -7,6 +7,11 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{FF69C4FB-258
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MinimalRichDomain.SourceGenerators", "src\MinimalRichDomain.SourceGenerators\MinimalRichDomain.SourceGenerators.csproj", "{18ABF4ED-34E6-42B4-A242-BAD1739AAF17}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Workflows", "Workflows", "{351631D9-E662-4C39-8B36-B9DADCCF0C34}"
+	ProjectSection(SolutionItems) = preProject
+		.github\workflows\publish.yml = .github\workflows\publish.yml
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
