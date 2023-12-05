@@ -1,124 +1,25 @@
-# This workflow uses actions that are not certified by GitHub.
-# They are provided by a third-party and are governed by
-# separate terms of service, privacy policy, and support
-# documentation.
-
-# This workflow will build, test, sign and package a WPF or Windows Forms desktop application
-# built on .NET Core.
-# To learn how to migrate your existing application to .NET Core,
-# refer to https://docs.microsoft.com/en-us/dotnet/desktop-wpf/migration/convert-project-from-net-framework
-#
-# To configure this workflow:
-#
-# 1. Configure environment variables
-# GitHub sets default environment variables for every workflow run.
-# Replace the variables relative to your project in the "env" section below.
-#
-# 2. Signing
-# Generate a signing certificate in the Windows Application
-# Packaging Project or add an existing signing certificate to the project.
-# Next, use PowerShell to encode the .pfx file using Base64 encoding
-# by running the following Powershell script to generate the output string:
-#
-# $pfx_cert = Get-Content '.\SigningCertificate.pfx' -Encoding Byte
-# [System.Convert]::ToBase64String($pfx_cert) | Out-File 'SigningCertificate_Encoded.txt'
-#
-# Open the output file, SigningCertificate_Encoded.txt, and copy the
-# string inside. Then, add the string to the repo as a GitHub secret
-# and name it "Base64_Encoded_Pfx."
-# For more information on how to configure your signing certificate for
-# this workflow, refer to https://github.com/microsoft/github-actions-for-desktop-apps#signing
-#
-# Finally, add the signing certificate password to the repo as a secret and name it "Pfx_Key".
-# See "Build the Windows Application Packaging project" below to see how the secret is used.
-#
-# For more information on GitHub Actions, refer to https://github.com/features/actions
-# For a complete CI/CD sample to get started with GitHub Action workflows for Desktop Applications,
-# refer to https://github.com/microsoft/github-actions-for-desktop-apps
-
-name: .NET Core Desktop
+name: Push MinimalRichDomain.SourceGenerators to NuGet
 
 on:
   push:
     branches: [ "master" ]
   pull_request:
     branches: [ "master" ]
-
+    
 jobs:
-
   build:
-
-    strategy:
-      matrix:
-        configuration: [Release]
-
-    runs-on: windows-latest  # For a list of available runner types, refer to
-                             # https://help.github.com/en/actions/reference/workflow-syntax-for-github-actions#jobsjob_idruns-on
-
-    env:
-      Solution_Name: MinimalRichDomain.sln                         # Replace with your solution name, i.e. MyWpfApp.sln.
-
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
     steps:
     - name: Checkout
-      uses: actions/checkout@v3
-      with:
-        fetch-depth: 0
-
-    # Install the .NET Core workload
-    - name: Install .NET Core
-      uses: actions/setup-dotnet@v3
-      with:
-        dotnet-version: 6.0.x
-
-    # Add  MSBuild to the PATH: https://github.com/microsoft/setup-msbuild
-    - name: Setup MSBuild.exe
-      uses: microsoft/setup-msbuild@v1.0.2
-
-    # Restore the package to populate the obj folder with RuntimeIdentifiers
-    - name: Restore the package
-      run: msbuild $env:Solution_Name /t:Restore /p:Configuration=$env:Configuration
-      env:
-        Configuration: ${{ matrix.configuration }}
-
-    # Build the package
-    - name: Build the package
-      run: msbuild -t:pack $env:Solution_Name /t:Restore /p:Configuration=$env:Configuration
-      env:
-        Configuration: ${{ matrix.configuration }}
-
-    - name: NuGet push
-      # You may pin to the exact commit or the version.
-      uses: edumserrano/nuget-push@v1.2.2
-      with:
-        # The API key for the NuGet server. Used when pushing the NuGet packages and symbols.
-        api-key: ${{ secrets.nuget_api_key }}
-        # Indicates whether this actions should fail if the NuGet package being pushed already exists. Defaults to false.
-        fail-if-exists: true
-        # The directory that will be used to push NuGet packages. It will push all NuGet packages (*.nupkg) and corresponding symbol packages (*.snupkg) present in the directory.
-        working-directory: src\MinimalRichDomain.SourceGenerators\bin\Release
-          
-   # - name: Publish NuGet
-    # You may pin to the exact commit or the version.
-    # uses: brandedoutcast/publish-nuget@c12b8546b67672ee38ac87bea491ac94a587f7cc
-    #  uses: brandedoutcast/publish-nuget@v2.5.5
-    #  with:
-        # Filepath of the project to be packaged, relative to root of repository
-     #   PROJECT_FILE_PATH: src\MinimalRichDomain.SourceGenerators\MinimalRichDomain.SourceGenerators.csproj
-        # NuGet package id, used for version detection & defaults to project name
-        #PACKAGE_NAME: # optional
-        # Filepath with version info, relative to root of repository & defaults to PROJECT_FILE_PATH
-        #VERSION_FILE_PATH: # optional
-        # Regex pattern to extract version info in a capturing group
-        #VERSION_REGEX: # optional, default is ^\s*<Version>(.*)<\/Version>\s*$
-        #  Useful with external providers like Nerdbank.GitVersioning, ignores VERSION_FILE_PATH & VERSION_REGEX
-        #VERSION_STATIC: # optional
-        # Flag to toggle git tagging, enabled by default
-        #TAG_COMMIT: # optional, default is true
-        # Format of the git tag, [*] gets replaced with actual version
-        #TAG_FORMAT: # optional, default is v*
-        # API key to authenticate with NuGet server
-     #   NUGET_KEY: ${{ secrets.nuget_api_key }}
-        # NuGet server uri hosting the packages, defaults to https://api.nuget.org
-        #NUGET_SOURCE: # optional, default is https://api.nuget.org
-        # Flag to toggle pushing symbols along with nuget package to the server, disabled by default
-      #  INCLUDE_SYMBOLS: true
+      uses: actions/checkout@v2
+    - name: Setup .NET SDK
+      uses: actions/setup-dotnet@v1
+    - name: Build
+      run: dotnet build src\MinimalRichDomain.SourceGenerators\MinimalRichDomain.SourceGenerators.csproj -c Release
+    #- name: Test
+    #  run: dotnet test -c Release --no-build
+    - name: Package
+      run: dotnet pack src\MinimalRichDomain.SourceGenerators\MinimalRichDomain.SourceGenerators.csproj -c Release --no-build --output .
+    - name: Push to NuGet
+      run: dotnet nuget push "*.nupkg" --api-key ${{secrets.nuget_api_key}} --source https://api.nuget.org/v3/index.json
