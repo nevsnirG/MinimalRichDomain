@@ -25,7 +25,6 @@ namespace MinimalRichDomain.SourceGenerators
                 var namespaceSymbol = semanticModel.GetDeclaredSymbol(classSyntax)?.ContainingNamespace;
                 var namespaceName = namespaceSymbol?.ToDisplayString() ?? string.Empty;
 
-
                 var className = classSyntax.Identifier.Text;
                 var idTypeName = $"{className}Id";
 
