@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace MinimalRichDomain.SourceGenerators
+﻿namespace System
 {
     [AttributeUsage(AttributeTargets.Class, AllowMultiple = false)]
     public class GenerateIdAttribute : Attribute { }
