@@ -1,0 +1,42 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<PackageId>MinimalRichDomain</PackageId>
+		<Title>Shared kernel for a minimal event-sourced rich domain model</Title>
+		<Version>0.1.0-alpha</Version>
+		<Authors>Ken van Grinsven</Authors>
+		<Company>Grinsven Software Solutions</Company>
+		<Product>MinimalRichDomain</Product>
+		<Description>Shared kernel for a minimal event-sourced rich domain model</Description>
+		<Copyright></Copyright>
+		<PackageProjectUrl>https://github.com/nevsnirG/MinimalRichDomain</PackageProjectUrl>
+		<PackageReadmeFile>README.md</PackageReadmeFile>
+		<RepositoryUrl>https://github.com/nevsnirG/MinimalRichDomain</RepositoryUrl>
+		<PackageTags>Shared Kernel; Event sourced domain model; Domain model;</PackageTags>
+		<PackageLicenseFile>LICENSE</PackageLicenseFile>
+		<PackageRequireLicenseAcceptance>True</PackageRequireLicenseAcceptance>
+		<IncludeSymbols>True</IncludeSymbols>
+		<SymbolPackageFormat>snupkg</SymbolPackageFormat>
+
+		<TargetFramework>net6.0</TargetFramework>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<Nullable>enable</Nullable>
+		<GeneratePackageOnBuild>True</GeneratePackageOnBuild>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<None Include="..\..\LICENSE">
+			<Pack>True</Pack>
+			<PackagePath>\</PackagePath>
+		</None>
+		<None Include="..\..\README.md">
+			<Pack>True</Pack>
+			<PackagePath>\</PackagePath>
+		</None>
+	</ItemGroup>
+
+	<ItemGroup>
+		<ProjectReference Include="..\..\..\MinimalDomainEvents\src\MinimalDomainEvents.Core\MinimalDomainEvents.Core.csproj" />
+	</ItemGroup>
+
+</Project>

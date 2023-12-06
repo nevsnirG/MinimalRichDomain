@@ -1,4 +1,63 @@
 # MinimalRichDomain
+A minimal impact shared kernel library for basic event-sourced domain models.
+
+### Usage
+```csharp
+public partial class BlogPost : Entity<BlogPostId>
+{
+    public Title Title { get; private set; }
+    public uint Views { get; private set; }
+
+#pragma warning disable CS8618 // Rehydration ensures invariants are maintained.
+    public BlogPost(BlogPostId id, IReadOnlyCollection<IDomainEvent> domainEvents) : base(id, domainEvents) { }
+#pragma warning restore CS8618
+
+    private BlogPost(BlogPostId key,
+                     Title title,
+                     uint views)
+        : base(key)
+    {
+        Title = title;
+        Views = views;
+    }
+
+    public static BlogPost New(Title title)
+    {
+        var blogPost = new BlogPost(BlogPostId.New(), title);
+        blogPost.RaiseDomainEvent(new NewBlogPostPostedEvent(blogPost.Id, blogPost.Title, 1));
+        return blogPost;
+    }
+
+    public void View(BloggerId viewedBy)
+    {
+        RaiseDomainEvent(new BlogPostViewedEvent(Id, viewedBy, DateTimeOffset.UtcNow, NextVersion));
+    }
+}
+
+public partial class BlogPost : IApplyEvent<NewBlogPostPostedEvent>, IApplyEvent<BlogPostViewedEvent>
+{
+    protected override void ValidateRehydration()
+    {
+        if (Title is null)
+            throw new InvalidOperationException("Blogger rehydrated in corrupt state. Title is missing.");
+    }
+
+    void IApplyEvent<NewBlogPostPostedEvent>.Apply(NewBlogPostPostedEvent @event)
+    {
+        Title = @event.Title;
+        Views = 0;
+    }
+
+    void IApplyEvent<BlogPostViewedEvent>.Apply(BlogPostViewedEvent @event)
+    {
+        Views++;
+    }
+}
+
+
+public sealed record class NewBlogPostPostedEvent(BlogPostId Id, Title Title, int Version) : IDomainEvent;
+public sealed record class BlogPostViewedEvent(BlogPostId BlogPostId, BloggerId ViewedBy, DateTimeOffset ViewedAt, int Version) : IDomainEvent;
+```
 
 ## MinimalRichDomain.SourceGenerators
 Source generator for Id value objects for domain entities.
