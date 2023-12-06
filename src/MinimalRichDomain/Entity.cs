@@ -44,7 +44,7 @@ public abstract class Entity<TId>
         DomainEventTracker.RaiseDomainEvent(domainEvent);
     }
 
-    public void Apply(IDomainEvent domainEvent)
+    public virtual void Apply(IDomainEvent domainEvent)
     {
         if (CanApply(domainEvent))
         {
@@ -65,7 +65,7 @@ public abstract class Entity<TId>
         throw new InvalidOperationException($"Cannot apply event with version {domainEvent.Version} to entity version {CurrentVersion}. Some history might be missing.");
     }
 
-    private bool CanApply(IDomainEvent @event)
+    protected virtual bool CanApply(IDomainEvent @event)
     {
         return @event.Version == NextVersion;
     }
