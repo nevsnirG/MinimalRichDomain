@@ -36,7 +36,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<ProjectReference Include="..\..\..\MinimalDomainEvents\src\MinimalDomainEvents.Core\MinimalDomainEvents.Core.csproj" />
+	  <PackageReference Include="MinimalDomainEvents.Core" Version="0.2.0-alpha" />
 	</ItemGroup>
 
 </Project>
