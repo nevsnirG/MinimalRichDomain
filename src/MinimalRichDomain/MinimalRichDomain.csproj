@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
 		<PackageId>MinimalRichDomain</PackageId>
@@ -35,8 +35,12 @@
 		</None>
 	</ItemGroup>
 
-	<ItemGroup>
-	  <PackageReference Include="MinimalDomainEvents.Core" Version="0.2.0-alpha" />
+	<ItemGroup Condition=" '$(Configuration)' == 'Debug' ">
+		<ProjectReference Include="..\..\..\MinimalDomainEvents\src\MinimalDomainEvents.Core\MinimalDomainEvents.Core.csproj" />
+	</ItemGroup>
+
+	<ItemGroup Condition=" '$(Configuration)' == 'Release' ">
+		<PackageReference Include="MinimalDomainEvents.Core" Version="0.2.0-alpha" />
 	</ItemGroup>
 
 </Project>
