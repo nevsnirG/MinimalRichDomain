@@ -24,13 +24,13 @@ public partial class BlogPost : Entity<BlogPostId>
     public static BlogPost New(Title title)
     {
         var blogPost = new BlogPost(BlogPostId.New(), title);
-        blogPost.RaiseDomainEvent(new NewBlogPostPostedEvent(blogPost.Id, blogPost.Title, 1));
+        blogPost.RaiseAndApplyDomainEvent(new NewBlogPostPostedEvent(blogPost.Id, blogPost.Title, 1));
         return blogPost;
     }
 
     public void View(BloggerId viewedBy)
     {
-        RaiseDomainEvent(new BlogPostViewedEvent(Id, viewedBy, DateTimeOffset.UtcNow, NextVersion));
+        RaiseAndApplyDomainEvent(new BlogPostViewedEvent(Id, viewedBy, DateTimeOffset.UtcNow, NextVersion));
     }
 }
 
