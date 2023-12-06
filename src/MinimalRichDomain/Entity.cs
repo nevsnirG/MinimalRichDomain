@@ -35,7 +35,7 @@ public abstract class Entity<TId>
 
     protected abstract void ValidateRehydration();
 
-    protected virtual void RaiseDomainEvent(IDomainEvent domainEvent)
+    protected virtual void RaiseAndApplyDomainEvent(IDomainEvent domainEvent)
     {
         if (domainEvent.Version != NextVersion)
             throw new InvalidOperationException($"Cannot raise a domain event for version {domainEvent.Version} while entity version is {CurrentVersion}.");
@@ -80,5 +80,4 @@ public abstract class Entity<TId>
     {
         CurrentVersion++;
     }
-
 }
