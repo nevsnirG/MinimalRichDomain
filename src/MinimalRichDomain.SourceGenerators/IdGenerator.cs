@@ -51,6 +51,7 @@ namespace MinimalRichDomain.SourceGenerators
             var namespaceLine = !string.IsNullOrEmpty(namespaceName) ? $"namespace {namespaceName};\r\n\r\n" : string.Empty;
             return $@"using System;
 
+#nullable enable
 {namespaceLine}public readonly partial struct {idTypeName}
 {{
     public Guid Value {{ get; }}
@@ -94,6 +95,7 @@ namespace MinimalRichDomain.SourceGenerators
         return Value.ToString();
     }}
 }}
+#nullable restore
     ";
         }
     }
