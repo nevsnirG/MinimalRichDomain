@@ -2,7 +2,7 @@ using FluentAssertions;
 
 namespace MinimalRichDomain.Tests;
 
-public class EntityTests
+public class AggregateRootTests
 {
     [Fact]
     public void CannotApplyEventWithLowerVersion()
@@ -50,13 +50,13 @@ public class EntityTests
 
     private sealed record class TestDomainEvent(int Version) : IDomainEvent;
 
-    private class TestEntity : Entity<Guid>, IApplyEvent<TestDomainEvent>
+    private class TestEntity : AggregateRoot<Guid>, IApplyEvent<TestDomainEvent>
     {
         public TestEntity() : base(Guid.NewGuid())
         {
         }
 
-        protected override void ValidateRehydration()
+        protected override void ValidateState()
         {
         }
 

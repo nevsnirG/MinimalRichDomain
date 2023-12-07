@@ -2,7 +2,7 @@
 using System.Reflection;
 
 namespace MinimalRichDomain;
-public abstract class Entity<TId>
+public abstract class AggregateRoot<TId>
 {
     public IReadOnlyCollection<IDomainEvent> DomainEvents => _domainEvents.AsReadOnly();
     public TId Id { get; }
@@ -10,13 +10,13 @@ public abstract class Entity<TId>
     protected int NextVersion => CurrentVersion + 1;
     private readonly List<IDomainEvent> _domainEvents;
 
-    protected Entity(TId id)
+    protected AggregateRoot(TId id)
     {
         Id = id;
         _domainEvents = new();
     }
 
-    protected Entity(TId id, IReadOnlyCollection<IDomainEvent> domainEvents)
+    protected AggregateRoot(TId id, IReadOnlyCollection<IDomainEvent> domainEvents)
     {
         Id = id;
         _domainEvents = new(domainEvents.Count);
@@ -30,10 +30,10 @@ public abstract class Entity<TId>
             Apply(domainEvent);
         }
 
-        ValidateRehydration();
+        ValidateState();
     }
 
-    protected abstract void ValidateRehydration();
+    protected abstract void ValidateState();
 
     protected virtual void RaiseAndApplyDomainEvent(IDomainEvent domainEvent)
     {
@@ -57,6 +57,7 @@ public abstract class Entity<TId>
             if (applyMethod is not default(MethodInfo))
             {
                 applyMethod.Invoke(this, new object[] { domainEvent });
+                ValidateState();
                 AppliedDomainEvent(domainEvent);
                 return;
             }
