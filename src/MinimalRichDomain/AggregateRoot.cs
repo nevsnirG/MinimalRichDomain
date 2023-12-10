@@ -25,17 +25,35 @@ public abstract class AggregateRoot<TId>
 
     protected virtual void Rehydrate(IReadOnlyCollection<IDomainEvent> domainEvents)
     {
-        foreach (var domainEvent in domainEvents.OrderBy(de => de.Version))
+        var domainEventsOrderedByVersion = domainEvents.OrderBy(de => de.Version);
+        ValidateHistory(domainEventsOrderedByVersion);
+
+        foreach (var domainEvent in domainEventsOrderedByVersion)
         {
             Apply(domainEvent);
         }
     }
 
+    private static void ValidateHistory(IOrderedEnumerable<IDomainEvent> domainEventsOrderedByVersion)
+    {
+        var lastVersion = 0;
+        if (!domainEventsOrderedByVersion.All(de =>
+        {
+            if (de.Version - lastVersion == 1)
+            {
+                lastVersion = de.Version;
+                return true;
+            }
+            else
+                return false;
+        }))
+        {
+            throw new InvalidOperationException($"Aggregate history incomplete. Missing domain event version {lastVersion + 1}.");
+        }
+    }
+
     protected virtual void RaiseAndApplyDomainEvent(IDomainEvent domainEvent)
     {
-        if (domainEvent.Version != NextVersion)
-            throw new InvalidOperationException($"Cannot raise a domain event for version {domainEvent.Version} while entity version is {CurrentVersion}.");
-
         Apply(domainEvent);
         DomainEventTracker.RaiseDomainEvent(domainEvent);
     }
@@ -54,11 +72,12 @@ public abstract class AggregateRoot<TId>
             {
                 applyMethod.Invoke(this, new object[] { domainEvent });
                 AppliedDomainEvent(domainEvent);
-                return;
             }
+            else
+                throw new InvalidOperationException($"No Apply method found for domain event type {domainEvent.GetType()}.");
         }
-
-        throw new InvalidOperationException($"Cannot apply event with version {domainEvent.Version} to entity version {CurrentVersion}. Some history might be missing.");
+        else
+            throw new InvalidOperationException($"Cannot apply a domain event with version {domainEvent.Version} while the aggregate is at version {CurrentVersion}. Some aggregate history might be missing.");
     }
 
     protected virtual bool CanApply(IDomainEvent @event)
