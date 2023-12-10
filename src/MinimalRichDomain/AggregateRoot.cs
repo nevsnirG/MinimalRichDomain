@@ -57,7 +57,6 @@ public abstract class AggregateRoot<TId>
             if (applyMethod is not default(MethodInfo))
             {
                 applyMethod.Invoke(this, new object[] { domainEvent });
-                ValidateState();
                 AppliedDomainEvent(domainEvent);
                 return;
             }
@@ -73,6 +72,7 @@ public abstract class AggregateRoot<TId>
 
     private void AppliedDomainEvent(IDomainEvent domainEvent)
     {
+        ValidateState();
         _domainEvents.Add(domainEvent);
         IncrementVersion();
     }
