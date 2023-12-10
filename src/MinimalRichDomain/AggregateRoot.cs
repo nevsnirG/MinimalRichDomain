@@ -29,11 +29,7 @@ public abstract class AggregateRoot<TId>
         {
             Apply(domainEvent);
         }
-
-        ValidateState();
     }
-
-    protected abstract void ValidateState();
 
     protected virtual void RaiseAndApplyDomainEvent(IDomainEvent domainEvent)
     {
@@ -76,6 +72,8 @@ public abstract class AggregateRoot<TId>
         _domainEvents.Add(domainEvent);
         IncrementVersion();
     }
+
+    protected abstract void ValidateState();
 
     private void IncrementVersion()
     {
