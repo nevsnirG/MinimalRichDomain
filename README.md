@@ -3,7 +3,7 @@ A minimal impact shared kernel library for basic event-sourced domain models.
 
 ### Usage
 ```csharp
-public partial class BlogPost : Entity<BlogPostId>
+public partial class BlogPost : AggregateRoot<BlogPostId>
 {
     public Title Title { get; private set; }
     public uint Views { get; private set; }
