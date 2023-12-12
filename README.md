@@ -21,6 +21,12 @@ public partial class BlogPost : AggregateRoot<BlogPostId>
         Views = views;
     }
 
+    protected override void ValidateState()
+    {
+        if (Title is null)
+            throw new InvalidOperationException("Blogger rehydrated in corrupt state. Title is missing.");
+    }
+
     public static BlogPost New(Title title)
     {
         var blogPost = new BlogPost(BlogPostId.New(), title);
@@ -36,12 +42,6 @@ public partial class BlogPost : AggregateRoot<BlogPostId>
 
 public partial class BlogPost : IApplyEvent<NewBlogPostPostedEvent>, IApplyEvent<BlogPostViewedEvent>
 {
-    protected override void ValidateRehydration()
-    {
-        if (Title is null)
-            throw new InvalidOperationException("Blogger rehydrated in corrupt state. Title is missing.");
-    }
-
     void IApplyEvent<NewBlogPostPostedEvent>.Apply(NewBlogPostPostedEvent @event)
     {
         Title = @event.Title;
