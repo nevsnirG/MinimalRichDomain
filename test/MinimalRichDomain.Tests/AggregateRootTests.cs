@@ -61,7 +61,19 @@ public class AggregateRootTests
         FluentActions.Invoking(action).Should().NotThrow("the history is complete.");
     }
 
+    [Fact]
+    public void CanNotApplyEventThatsNotImplemented()
+    {
+        var domainEvent = new TestDomainEventNotImplemented(1);
+        var testEntity = new TestEntity();
+
+        void action() => testEntity.ApplyForTest(domainEvent);
+
+        FluentActions.Invoking(action).Should().Throw<InvalidOperationException>().WithMessage("No Apply method has been implemented for type: *.");
+    }
+
     private sealed record class TestDomainEvent(int Version) : IDomainEvent;
+    private sealed record class TestDomainEventNotImplemented(int Version) : IDomainEvent;
 
     private class TestEntity : AggregateRoot<Guid>
     {
@@ -78,14 +90,14 @@ public class AggregateRootTests
 
         protected override void Apply(IDomainEvent domainEvent)
         {
-            Apply((dynamic)domainEvent);
+            ApplyEvent((dynamic)domainEvent);
         }
 
         protected override void ValidateState()
         {
         }
 
-        private void Apply(TestDomainEvent @event)
+        private void ApplyEvent(TestDomainEvent @event)
         {
         }
     }
