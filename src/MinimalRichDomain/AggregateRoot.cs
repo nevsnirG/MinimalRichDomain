@@ -1,5 +1,4 @@
 ﻿using MinimalDomainEvents.Core;
-using System.Reflection;
 
 namespace MinimalRichDomain;
 public abstract class AggregateRoot<TId> : IEntity<TId>
@@ -28,55 +27,32 @@ public abstract class AggregateRoot<TId> : IEntity<TId>
     protected virtual void Rehydrate(IReadOnlyCollection<IDomainEvent> domainEvents)
     {
         var domainEventsOrderedByVersion = domainEvents.OrderBy(de => de.Version);
-        ValidateHistory(domainEventsOrderedByVersion);
 
         foreach (var domainEvent in domainEventsOrderedByVersion)
         {
-            Apply(domainEvent);
-        }
-    }
-
-    private static void ValidateHistory(IOrderedEnumerable<IDomainEvent> domainEventsOrderedByVersion)
-    {
-        var lastVersion = 0;
-        if (!domainEventsOrderedByVersion.All(de =>
-        {
-            if (de.Version - lastVersion == 1)
-            {
-                lastVersion = de.Version;
-                return true;
-            }
-            else
-                return false;
-        }))
-        {
-            throw new InvalidOperationException($"Aggregate history incomplete. Missing domain event version {lastVersion + 1}.");
+            ApplyInternal(domainEvent);
         }
     }
 
     protected virtual void RaiseAndApplyDomainEvent(IDomainEvent domainEvent)
     {
-        Apply(domainEvent);
+        ApplyInternal(domainEvent);
         DomainEventTracker.RaiseDomainEvent(domainEvent);
     }
 
-    protected virtual void Apply(IDomainEvent domainEvent)
+    private void ApplyInternal(IDomainEvent domainEvent)
     {
         if (CanApply(domainEvent))
         {
-            var eventType = domainEvent.GetType();
-            var interfaceType = typeof(IApplyEvent<>).MakeGenericType(eventType);
-
-            var applyMethod = GetType().GetInterfaceMap(interfaceType).TargetMethods
-                .FirstOrDefault(m => m.Name.EndsWith(nameof(IApplyEvent<IDomainEvent>.Apply)));
-
-            if (applyMethod is not default(MethodInfo))
+            try
             {
-                applyMethod.Invoke(this, new object[] { domainEvent });
+                Apply(domainEvent);
                 AppliedDomainEvent(domainEvent);
             }
-            else
-                throw new InvalidOperationException($"No Apply method found for domain event type {domainEvent.GetType()}.");
+            catch (Microsoft.CSharp.RuntimeBinder.RuntimeBinderException)
+            {
+                throw new InvalidOperationException($"No Apply method has been implemented for type: {domainEvent.GetType().FullName}.");
+            }
         }
         else
             throw new InvalidOperationException($"Cannot apply a domain event with version {domainEvent.Version} while the aggregate is at version {CurrentVersion}. Some aggregate history might be missing.");
@@ -86,6 +62,8 @@ public abstract class AggregateRoot<TId> : IEntity<TId>
     {
         return @event.Version == NextVersion;
     }
+
+    protected abstract void Apply(IDomainEvent @event);
 
     private void AppliedDomainEvent(IDomainEvent domainEvent)
     {

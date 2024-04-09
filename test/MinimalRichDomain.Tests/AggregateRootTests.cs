@@ -86,7 +86,7 @@ public class AggregateRootTests
 
         public new void Apply(IDomainEvent domainEvent)
         {
-            base.Apply(domainEvent);
+            base.ApplyInternal(domainEvent);
         }
 
         protected override void ValidateState()
