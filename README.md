@@ -21,12 +21,6 @@ public partial class BlogPost : AggregateRoot<BlogPostId>
         Views = views;
     }
 
-    protected override void ValidateState()
-    {
-        if (Title is null)
-            throw new InvalidOperationException("Blogger rehydrated in corrupt state. Title is missing.");
-    }
-
     public static BlogPost New(Title title)
     {
         var blogPost = new BlogPost(BlogPostId.New(), title);
@@ -40,15 +34,26 @@ public partial class BlogPost : AggregateRoot<BlogPostId>
     }
 }
 
-public partial class BlogPost : IApplyEvent<NewBlogPostPostedEvent>, IApplyEvent<BlogPostViewedEvent>
+public partial class BlogPost
 {
-    void IApplyEvent<NewBlogPostPostedEvent>.Apply(NewBlogPostPostedEvent @event)
+    protected override void ValidateState()
+    {
+        if (Title is null)
+            throw new InvalidOperationException("Blogger rehydrated in corrupt state. Title is missing.");
+    }
+
+    protected override void Apply(MinimalRichDomain.IDomainEvent @event)
+    {
+        Apply((dynamic)@event);
+    }
+
+    private void Apply(NewBlogPostPostedEvent @event)
     {
         Title = @event.Title;
         Views = 0;
     }
 
-    void IApplyEvent<BlogPostViewedEvent>.Apply(BlogPostViewedEvent @event)
+    private void Apply(BlogPostViewedEvent @event)
     {
         Views++;
     }
@@ -80,34 +85,34 @@ Generated struct:
 #nullable enable
 namespace SameNameSpaceAsEntityIdWasGeneratedFrom;
 
-public readonly partial struct IdTypeName
+public readonly partial struct BlogPostId
 {
     public Guid Value { get; }
 
-    public static IdTypeName Empty => new(Guid.Empty);
+    public static BlogPostId Empty => new(Guid.Empty);
 
-    private IdTypeName(Guid value)
+    private BlogPostId(Guid value)
     {
         Value = value;
     }
 
-    public static IdTypeName New() => new(Guid.NewGuid());
+    public static BlogPostId New() => new(Guid.NewGuid());
 
-    public static IdTypeName FromValue(Guid value) => new(value);
+    public static BlogPostId FromValue(Guid value) => new(value);
 
-    public static bool operator ==(IdTypeName left, IdTypeName right)
+    public static bool operator ==(BlogPostId left, BlogPostId right)
     {
         return left.Equals(right);
     }
 
-    public static bool operator !=(IdTypeName left, IdTypeName right)
+    public static bool operator !=(BlogPostId left, BlogPostId right)
     {
         return !left.Equals(right);
     }
 
     public override bool Equals(object? obj)
     {
-        if(obj is not IdTypeName other)
+        if(obj is not BlogPostId other)
             return false;
         else
             return Value == other.Value;
