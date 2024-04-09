@@ -2,12 +2,14 @@
 using System.Reflection;
 
 namespace MinimalRichDomain;
-public abstract class AggregateRoot<TId>
+public abstract class AggregateRoot<TId> : IEntity<TId>
 {
     public IReadOnlyCollection<IDomainEvent> DomainEvents => _domainEvents.AsReadOnly();
     public TId Id { get; }
     public int CurrentVersion { get; private set; }
+
     protected int NextVersion => CurrentVersion + 1;
+
     private readonly List<IDomainEvent> _domainEvents;
 
     protected AggregateRoot(TId id)
@@ -58,7 +60,7 @@ public abstract class AggregateRoot<TId>
         DomainEventTracker.RaiseDomainEvent(domainEvent);
     }
 
-    public virtual void Apply(IDomainEvent domainEvent)
+    protected virtual void Apply(IDomainEvent domainEvent)
     {
         if (CanApply(domainEvent))
         {

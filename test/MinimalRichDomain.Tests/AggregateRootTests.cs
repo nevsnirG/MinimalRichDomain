@@ -84,6 +84,11 @@ public class AggregateRootTests
 
         public TestEntity(IReadOnlyCollection<IDomainEvent> domainEvents) : base(Guid.NewGuid(), domainEvents) { }
 
+        public new void Apply(IDomainEvent domainEvent)
+        {
+            base.Apply(domainEvent);
+        }
+
         protected override void ValidateState()
         {
         }
