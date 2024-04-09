@@ -40,7 +40,7 @@ public abstract class AggregateRoot<TId> : IEntity<TId>
         DomainEventTracker.RaiseDomainEvent(domainEvent);
     }
 
-    private void ApplyInternal(IDomainEvent domainEvent)
+    protected void ApplyInternal(IDomainEvent domainEvent)
     {
         if (CanApply(domainEvent))
         {
