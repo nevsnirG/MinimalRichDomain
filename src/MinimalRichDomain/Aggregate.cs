@@ -1,7 +1,7 @@
 ﻿using MinimalDomainEvents.Core;
 
 namespace MinimalRichDomain;
-public abstract class AggregateRoot<TId> : IEntity<TId>
+public abstract class Aggregate<TId> : IEntity<TId>
 {
     public IReadOnlyCollection<IDomainEvent> DomainEvents => _domainEvents.AsReadOnly();
     public TId Id { get; }
@@ -11,20 +11,20 @@ public abstract class AggregateRoot<TId> : IEntity<TId>
 
     private readonly List<IDomainEvent> _domainEvents;
 
-    protected AggregateRoot(TId id)
+    protected Aggregate(TId id)
     {
         Id = id;
         _domainEvents = new();
     }
 
-    protected AggregateRoot(TId id, IReadOnlyCollection<IDomainEvent> domainEvents)
+    protected Aggregate(TId id, IReadOnlyCollection<IDomainEvent> domainEvents)
     {
         Id = id;
         _domainEvents = new(domainEvents.Count);
         Rehydrate(domainEvents);
     }
 
-    protected virtual void Rehydrate(IReadOnlyCollection<IDomainEvent> domainEvents)
+    private void Rehydrate(IReadOnlyCollection<IDomainEvent> domainEvents)
     {
         var domainEventsOrderedByVersion = domainEvents.OrderBy(de => de.Version);
 
@@ -69,13 +69,8 @@ public abstract class AggregateRoot<TId> : IEntity<TId>
     {
         ValidateState();
         _domainEvents.Add(domainEvent);
-        IncrementVersion();
+        CurrentVersion++;
     }
 
     protected abstract void ValidateState();
-
-    private void IncrementVersion()
-    {
-        CurrentVersion++;
-    }
 }
