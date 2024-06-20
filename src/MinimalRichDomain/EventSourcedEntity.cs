@@ -1,23 +1,22 @@
 ﻿using MinimalDomainEvents.Core;
 
 namespace MinimalRichDomain;
-public abstract class Aggregate<TId> : IEntity<TId>
+public abstract class EventSourcedEntity<TId> : IEntity<TId>
 {
     public IReadOnlyCollection<IDomainEvent> DomainEvents => _domainEvents.AsReadOnly();
     public TId Id { get; }
     public int CurrentVersion { get; private set; }
-
-    protected int NextVersion => CurrentVersion + 1;
+    public int NextVersion => CurrentVersion + 1;
 
     private readonly List<IDomainEvent> _domainEvents;
 
-    protected Aggregate(TId id)
+    protected EventSourcedEntity(TId id)
     {
         Id = id;
         _domainEvents = new();
     }
 
-    protected Aggregate(TId id, IReadOnlyCollection<IDomainEvent> domainEvents)
+    protected EventSourcedEntity(TId id, IReadOnlyCollection<IDomainEvent> domainEvents)
     {
         Id = id;
         _domainEvents = new(domainEvents.Count);
