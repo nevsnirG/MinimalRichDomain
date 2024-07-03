@@ -72,8 +72,8 @@ public class AggregateTests
         FluentActions.Invoking(action).Should().Throw<InvalidOperationException>().WithMessage("No Apply method has been implemented for type: *.");
     }
 
-    private sealed record class TestDomainEvent(int Version) : IDomainEvent;
-    private sealed record class TestDomainEventNotImplemented(int Version) : IDomainEvent;
+    private sealed record class TestDomainEvent(int EntityVersion) : IDomainEvent;
+    private sealed record class TestDomainEventNotImplemented(int EntityVersion) : IDomainEvent;
 
     private class TestAggregate : Aggregate<Guid>
     {

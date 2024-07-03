@@ -25,7 +25,7 @@ public abstract class EventSourcedEntity<TId> : IEntity<TId>
 
     private void Rehydrate(IReadOnlyCollection<IDomainEvent> domainEvents)
     {
-        var domainEventsOrderedByVersion = domainEvents.OrderBy(de => de.Version);
+        var domainEventsOrderedByVersion = domainEvents.OrderBy(de => de.EntityVersion);
 
         foreach (var domainEvent in domainEventsOrderedByVersion)
         {
@@ -54,12 +54,12 @@ public abstract class EventSourcedEntity<TId> : IEntity<TId>
             }
         }
         else
-            throw new InvalidOperationException($"Cannot apply a domain event with version {domainEvent.Version} while the aggregate is at version {CurrentVersion}. Some aggregate history might be missing.");
+            throw new InvalidOperationException($"Cannot apply a domain event with version {domainEvent.EntityVersion} while the aggregate is at version {CurrentVersion}. Some aggregate history might be missing.");
     }
 
     protected virtual bool CanApply(IDomainEvent @event)
     {
-        return @event.Version == NextVersion;
+        return @event.EntityVersion == NextVersion;
     }
 
     protected abstract void Apply(IDomainEvent @event);
