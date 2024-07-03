@@ -93,10 +93,6 @@ public class EventSourcedEntityTests
             ApplyEvent((dynamic)domainEvent);
         }
 
-        protected override void ValidateState()
-        {
-        }
-
         private void ApplyEvent(TestDomainEvent @event)
         {
         }
