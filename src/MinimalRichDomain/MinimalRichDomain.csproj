@@ -3,7 +3,7 @@
 	<PropertyGroup>
 		<PackageId>MinimalRichDomain</PackageId>
 		<Title>Shared kernel for a minimal event-sourced rich domain model</Title>
-		<Version>1.1.1</Version>
+		<Version>1.1.2</Version>
 		<Authors>Ken van Grinsven</Authors>
 		<Company>Grinsven Software Solutions</Company>
 		<Product>MinimalRichDomain</Product>
