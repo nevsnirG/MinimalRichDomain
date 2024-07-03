@@ -2,13 +2,13 @@ using FluentAssertions;
 
 namespace MinimalRichDomain.Tests;
 
-public class AggregateTests
+public class EventSourcedEntityTests
 {
     [Fact]
     public void CannotApplyEventWithLowerVersion()
     {
         var domainEvent = new TestDomainEvent(-1);
-        var testAggregate = new TestAggregate();
+        var testAggregate = new TestEventSourcedEntity();
 
         var action = () => testAggregate.ApplyForTest(domainEvent);
 
@@ -19,7 +19,7 @@ public class AggregateTests
     public void CannotApplyEventWithSameVersion()
     {
         var domainEvent = new TestDomainEvent(0);
-        var testAggregate = new TestAggregate();
+        var testAggregate = new TestEventSourcedEntity();
 
         var action = () => testAggregate.ApplyForTest(domainEvent);
 
@@ -30,7 +30,7 @@ public class AggregateTests
     public void CannotApplyEventWithTooHighVersion()
     {
         var domainEvent = new TestDomainEvent(2);
-        var testAggregate = new TestAggregate();
+        var testAggregate = new TestEventSourcedEntity();
 
         var action = () => testAggregate.ApplyForTest(domainEvent);
 
@@ -41,7 +41,7 @@ public class AggregateTests
     public void CanApplyEventWithIncrementalVersion()
     {
         var domainEvent = new TestDomainEvent(1);
-        var testAggregate = new TestAggregate();
+        var testAggregate = new TestEventSourcedEntity();
 
         testAggregate.ApplyForTest(domainEvent);
 
@@ -56,7 +56,7 @@ public class AggregateTests
         var domainEvent3 = new TestDomainEvent(3);
         var history = new List<TestDomainEvent> { domainEvent1, domainEvent2, domainEvent3 };
 
-        TestAggregate action() => new(history);
+        TestEventSourcedEntity action() => new(history);
 
         FluentActions.Invoking(action).Should().NotThrow("the history is complete.");
     }
@@ -65,7 +65,7 @@ public class AggregateTests
     public void CanNotApplyEventThatsNotImplemented()
     {
         var domainEvent = new TestDomainEventNotImplemented(1);
-        var testAggregate = new TestAggregate();
+        var testAggregate = new TestEventSourcedEntity();
 
         void action() => testAggregate.ApplyForTest(domainEvent);
 
@@ -75,13 +75,13 @@ public class AggregateTests
     private sealed record class TestDomainEvent(int EntityVersion) : IDomainEvent;
     private sealed record class TestDomainEventNotImplemented(int EntityVersion) : IDomainEvent;
 
-    private class TestAggregate : Aggregate<Guid>
+    private class TestEventSourcedEntity : EventSourcedEntity<Guid>
     {
-        public TestAggregate() : base(Guid.NewGuid())
+        public TestEventSourcedEntity() : base(Guid.NewGuid())
         {
         }
 
-        public TestAggregate(IReadOnlyCollection<IDomainEvent> domainEvents) : base(Guid.NewGuid(), domainEvents) { }
+        public TestEventSourcedEntity(IReadOnlyCollection<IDomainEvent> domainEvents) : base(Guid.NewGuid(), domainEvents) { }
 
         public void ApplyForTest(IDomainEvent domainEvent)
         {
