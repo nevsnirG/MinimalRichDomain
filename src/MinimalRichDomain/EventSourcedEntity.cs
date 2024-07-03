@@ -66,10 +66,7 @@ public abstract class EventSourcedEntity<TId> : IEntity<TId>
 
     private void AppliedDomainEvent(IDomainEvent domainEvent)
     {
-        ValidateState();
         _domainEvents.Add(domainEvent);
         CurrentVersion++;
     }
-
-    protected abstract void ValidateState();
 }
