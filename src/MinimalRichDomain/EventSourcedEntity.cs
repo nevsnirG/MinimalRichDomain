@@ -33,6 +33,12 @@ public abstract class EventSourcedEntity<TId> : IEntity<TId>
         }
     }
 
+    protected virtual void RecordEvent(IDomainEvent domainEvent)
+    {
+        AppliedDomainEvent(domainEvent);
+        DomainEventTracker.RaiseDomainEvent(domainEvent);
+    }
+
     protected virtual void RaiseAndApplyDomainEvent(IDomainEvent domainEvent)
     {
         ApplyInternal(domainEvent);
